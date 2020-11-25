@@ -1,5 +1,5 @@
-from FrozenLake import *
-from FrozenLake import value_iteration
+from FrozenLake import FrozenLake
+
 
 def main():
     seed = 0
