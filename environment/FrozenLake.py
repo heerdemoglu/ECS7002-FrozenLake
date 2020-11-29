@@ -18,7 +18,7 @@ def _printoptions(*args, **kwargs):
 
 
 class FrozenLake(Environment):
-    def __init__(self, lake, slip, max_steps, seed = None):
+    def __init__(self, lake, slip, max_steps, seed=None):
 
         self.random_state = np.random.RandomState(seed)
         self.lake = np.array(lake)
@@ -42,7 +42,7 @@ class FrozenLake(Environment):
         # Indices to states (coordinates), states (coordinates) to indices
         self.gmap = af.derive_gmap(self.lake)
         self.itos = list(product(range(self.gmap.shape[0]), range(self.gmap.shape[1])))
-        self.itos.append(tuple((-1,-1)))
+        self.itos.append(tuple((-1, -1)))
         self.stoi = {s: i for (i, s) in enumerate(self.itos)}
         # print("itos:", self.itos)
         # print("stoi", self.stoi)
@@ -52,7 +52,7 @@ class FrozenLake(Environment):
             for action_index, action in enumerate(self.actions):
 
                 if state_index == self.absorbing_state:
-                    next_state == (-1,-1)
+                    next_state == (-1, -1)
                     next_state_index = self.stoi.get(next_state, state_index)
                     self._p[next_state_index, state_index, action_index] = 1.0
                 elif state_index != self.absorbing_state and (self.lake_flat[state_index] == '#' or
@@ -99,7 +99,7 @@ class FrozenLake(Environment):
         else:
             return 0
 
-    def render(self, policy = None, value = None):
+    def render(self, policy=None, value=None):
         if policy is None:
             lake = np.array(self.lake_flat)
 

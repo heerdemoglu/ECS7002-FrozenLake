@@ -1,4 +1,6 @@
-################ Non-tabular model-free algorithms ################
+import numpy as np
+
+
 class LinearWrapper:
     def __init__(self, env):
         self.env = env

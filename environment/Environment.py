@@ -5,11 +5,15 @@ from environment.EnvironmentModel import EnvironmentModel
 
 
 class Environment(EnvironmentModel):
+
     def __init__(self, n_states, n_actions, max_steps, pi, seed=None):
         EnvironmentModel.__init__(self, n_states, n_actions, seed)
 
         self.max_steps = max_steps
         self.random_state = np.random.RandomState(seed)
+
+        self.n_steps = 0
+        self.state = self.random_state.choice(self.n_states, p=self.pi)
 
         self.pi = pi
         if self.pi is None:
@@ -33,4 +37,10 @@ class Environment(EnvironmentModel):
         return self.state, reward, done
 
     def render(self, policy=None, value=None):
+        raise NotImplementedError()
+
+    def p(self, next_state, state, action):
+        raise NotImplementedError()
+
+    def r(self, next_state, state, action):
         raise NotImplementedError()
