@@ -1,4 +1,7 @@
-from FrozenLake import FrozenLake
+from environment.FrozenLake import FrozenLake
+from learning_methods.TabularModelBasedMethods import policy_iteration, value_iteration
+from learning_methods.TabularModelFreeMethods import sarsa, q_learning
+from learning_methods.LinearWrapper import LinearWrapper, linear_sarsa, linear_q_learning
 
 
 def main():

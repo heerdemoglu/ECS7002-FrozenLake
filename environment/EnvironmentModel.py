@@ -1,6 +1,7 @@
 import contextlib
 import numpy as np
 
+
 # Configures numpy print options
 @contextlib.contextmanager
 def _printoptions(*args, **kwargs):
@@ -10,6 +11,7 @@ def _printoptions(*args, **kwargs):
         yield
     finally:
         np.set_printoptions(**original)
+
 
 class EnvironmentModel:
     def __init__(self, n_states, n_actions, seed=None):
