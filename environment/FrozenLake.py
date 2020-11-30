@@ -3,7 +3,7 @@ from itertools import product
 
 from environment.Environment import Environment
 import numpy as np
-import Auxilary_Functions as af
+from environment import Auxilary_Functions as af
 
 
 # Configures numpy print options

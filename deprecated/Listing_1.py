@@ -2,7 +2,8 @@ from itertools import product
 
 import numpy as np
 import contextlib
-import Auxilary_Functions as af
+from environment import Auxilary_Functions as af
+
 
 # Configures numpy print options
 @contextlib.contextmanager
