@@ -41,23 +41,54 @@ class LinearWrapper:
     def render(self, policy=None, value=None):
         self.env.render(policy, value)
 
+
 # Uses Sutton and Barto's Implementation - Ch 8.4 Pg 212 Edition 1
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    raise NotImplementedError()
-    # random_state = np.random.RandomState(seed)
-    #
-    # eta = np.linspace(eta, 0, max_episodes)
-    # epsilon = np.linspace(epsilon, 0, max_episodes)
-    #
-    # theta = np.zeros(env.n_features)
-    #
-    # for i in range(max_episodes):
-    #     features = env.reset()
-    #     # q = features.dot(theta)
-    #
-    #     # TODO:
-    #
-    # return theta
+    random_state = np.random.RandomState(seed)
+
+    eta = np.linspace(eta, 0, max_episodes)
+    epsilon = np.linspace(epsilon, 0, max_episodes)
+
+    theta = np.zeros(env.n_features)
+
+    for i in range(max_episodes):
+        features = env.reset()  # set the initial state by random, states are our features here (a, (s,a))
+        q = features.dot(theta)  # for each action construct Q using LF Approx. (Line 4->6) - Vectorized for loop
+
+        # Choose A from S using policy from Q:
+        if np.random.uniform(0, 1) < (1 - epsilon[i]):
+            aa = np.random.choice(np.flatnonzero(q == q.max()))  # does random tie breaking as well
+        else:
+            aa = np.random.choice(env.n_actions)
+
+        done = False  # initially false, check in step of the loop
+        while not done:  # Starts line 7
+
+            # Act on the action observe reward and next LFA state:
+            next_features, reward, done = env.step(aa)
+
+            # Calculate temporal difference: (Line 15):
+            delta = reward - q[aa]  # R - Q(s,a)
+
+            # Create new Q from the update:
+            q = next_features.dot(theta)
+
+            # Choose A' from S' using policy from Q:
+            if np.random.uniform(0, 1) < (1 - epsilon[i]):
+                a = np.random.choice(np.flatnonzero(q == q.max()))  # does random tie breaking as well
+            else:
+                a = np.random.choice(env.n_actions)
+
+            # Lines 19-21:
+            delta += gamma * q[a]
+            theta += eta[i] * delta * features[aa]
+
+            # State update:
+            features = next_features
+            aa = a
+        # Line 22 - While loop ends
+    # Line 23: For loop ends
+    return theta
 
 
 # Apply Algorithm 1 from the Assignment Document:
@@ -76,7 +107,6 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
         q = features.dot(theta)  # for each action construct Q using LF Approx. (Line 4->6) - Vectorized for loop
 
         done = False  # initially false, check in step of the loop
-        delta = 0
         while not done:  # Starts line 7
 
             # Do epsilon greedy approach: (Lines 8-12)
@@ -92,12 +122,14 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             delta = reward - q[a]
 
             # Calculate new Q values for the next state: (Lines 16-18) - vectorized for loop
-            q = next_features.dot(theta)  # TODO: check here as well use of features matrix
+            q = next_features.dot(theta)
 
             # Lines 19-21:
             delta += gamma * max(q)
             theta += eta[i] * delta * features[a]
-            features = next_features  # not being used; how to incorporate state to wrapper
+
+            # State update:
+            features = next_features
         # Line 22 - While loop ends
     # Line 23: For loop ends
     return theta
