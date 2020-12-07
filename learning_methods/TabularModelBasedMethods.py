@@ -57,7 +57,7 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     while not stable:
         values = policy_evaluation(env, policy, gamma, theta, max_iterations)
         policy, stable = policy_improvement(env, policy, values, gamma)
-        print(stable)
+        # print(stable)
 
     return policy, values
 
