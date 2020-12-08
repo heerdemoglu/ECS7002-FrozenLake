@@ -40,12 +40,12 @@ class FrozenLake(Environment):
         self.actions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
         # Indices to states (coordinates), states (coordinates) to indices
-        self.gmap = af.derive_gmap(self.lake)
+        self.gmap = af.derive_gmap(
+            self.lake)  # convert the self.lake into a 'reward' map, 1 at the goal, 0 everywhere else
         self.itos = list(product(range(self.gmap.shape[0]), range(self.gmap.shape[1])))
-        self.itos.append(tuple((-1, -1)))
+        self.itos.append(tuple((-1, -1)))  # create an absorb state
         self.stoi = {s: i for (i, s) in enumerate(self.itos)}
-        # print("itos:", self.itos)
-        # print("stoi", self.stoi)
+
         # Precomputed transition probabilities
         self._p = np.zeros((self.n_states, self.n_states, self.n_actions))
         for state_index, state in enumerate(self.itos):
@@ -54,33 +54,46 @@ class FrozenLake(Environment):
                 if state_index == self.absorbing_state:
                     next_state == (-1, -1)
                     next_state_index = self.stoi.get(next_state, state_index)
-                    self._p[next_state_index, state_index, action_index] = 1.0
-                elif state_index != self.absorbing_state and (self.lake_flat[state_index] == '#' or
-                                                              self.lake_flat[state_index] == '$'):
+                    self._p[
+                        next_state_index, state_index, action_index] = 1.0  # stay in absorb state if already in absorb state
+                elif state_index != self.absorbing_state and (
+                        self.lake_flat[state_index] == '#' or self.lake_flat[state_index] == '$'):
                     next_state = (-1, -1)  # stay in position
-                    next_state_index = self.stoi.get(next_state, state_index)
+                    next_state_index = self.stoi.get(next_state, state_index)  # to absorb state if at hole or reward
                     self._p[next_state_index, state_index, action_index] = 1.0
-                else:
+                else:  # if not at hole, reward or absorb state
                     next_state = (state[0] + action[0], state[1] + action[1])  # update position
-                    next_state_s0 = (state[0] + self.actions[0][0], state[1] + self.actions[0][1])
-                    next_state_s1 = (state[0] + self.actions[1][0], state[1] + self.actions[1][1])
-                    next_state_s2 = (state[0] + self.actions[2][0], state[1] + self.actions[2][1])
-                    next_state_s3 = (state[0] + self.actions[3][0], state[1] + self.actions[3][1])
-                    # print("next_states:", next_state, next_state_s0, next_state_s1, next_state_s2, next_state_s3)
+                    next_state_s0 = (
+                    state[0] + self.actions[0][0], state[1] + self.actions[0][1])  # consider slip direction 1
+                    next_state_s1 = (
+                    state[0] + self.actions[1][0], state[1] + self.actions[1][1])  # consider slip direction 2
+                    next_state_s2 = (
+                    state[0] + self.actions[2][0], state[1] + self.actions[2][1])  # consider slip direction 3
+                    next_state_s3 = (
+                    state[0] + self.actions[3][0], state[1] + self.actions[3][1])  # consider slip direction 4
+
                     # If next_state is not valid, default to current state index
                     next_state_index = self.stoi.get(next_state, state_index)
-                    next_state_index_s0 = self.stoi.get(next_state_s0, state_index)
-                    next_state_index_s1 = self.stoi.get(next_state_s1, state_index)
-                    next_state_index_s2 = self.stoi.get(next_state_s2, state_index)
-                    next_state_index_s3 = self.stoi.get(next_state_s3, state_index)
-                    # print("next_index:", next_state_index, next_state_index_s0, next_state_index_s1,
-                    # next_state_index_s2, next_state_index_s3)
+                    next_state_index_s0 = self.stoi.get(next_state_s0,
+                                                        state_index)  # next state based on slip direction 1
+                    next_state_index_s1 = self.stoi.get(next_state_s1,
+                                                        state_index)  # next state based on slip direction 2
+                    next_state_index_s2 = self.stoi.get(next_state_s2,
+                                                        state_index)  # next state based on slip direction 3
+                    next_state_index_s3 = self.stoi.get(next_state_s3,
+                                                        state_index)  # next state based on slip direction 4
+
                     # define a probability
-                    self._p[next_state_index_s0, state_index, action_index] += self.slip/4
-                    self._p[next_state_index_s1, state_index, action_index] += self.slip/4
-                    self._p[next_state_index_s2, state_index, action_index] += self.slip/4
-                    self._p[next_state_index_s3, state_index, action_index] += self.slip/4
-                    self._p[next_state_index, state_index, action_index] += 1.0-self.slip
+                    self._p[
+                        next_state_index_s0, state_index, action_index] += self.slip / 4  # probabilty to slip in any of 4 directions
+                    self._p[
+                        next_state_index_s1, state_index, action_index] += self.slip / 4  # probabilty to slip in any of 4 directions
+                    self._p[
+                        next_state_index_s2, state_index, action_index] += self.slip / 4  # probabilty to slip in any of 4 directions
+                    self._p[
+                        next_state_index_s3, state_index, action_index] += self.slip / 4  # probabilty to slip in any of 4 directions
+                    self._p[
+                        next_state_index, state_index, action_index] += 1.0 - self.slip  # probabilty to go in intended direction + probability of ending up there due to slip
 
     def step(self, action):
         state, reward, done = Environment.step(self, action)
@@ -137,3 +150,9 @@ class FrozenLake(Environment):
 
             env.render()
             print('Reward: {0}.'.format(r))
+
+    def is_final(self, state):
+        if state == self.absorbing_state:
+            return True
+        else:
+            return False
