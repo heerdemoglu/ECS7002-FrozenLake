@@ -5,7 +5,7 @@ Due: December 11, 2020
 ### This is the text form of README.md. ###
 
 Team Members:
-Luke Abela (200588919), Hasan Emre Erdemoglu(200377106), Suraj Gehlot(7502072165)
+Luke Abela (200588919), Hasan Emre Erdemoglu(200377106), Suraj Gehlot(200469881)
 
 About Project Structure: 
 The code is runnable via scripts: RunEnvironmentBig.py
