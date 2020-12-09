@@ -9,21 +9,27 @@ class LinearWrapper:
         self.n_states = self.env.n_states
 
         # Features are the grid of actions and states. (Dimensionality; Every combination of (s,a))
+        # self.n_actions * self.n_states: represents dimensionality all movements combinations
+        # this will be used with one-hot encoding to uniquely identify every state-action with a unique sparse
+        # identifier.
         self.n_features = self.n_actions * self.n_states
 
     def encode_state(self, s):
-        features = np.zeros((self.n_actions, self.n_features))
+        features = np.zeros((self.n_actions, self.n_features))  # For this question every action has separate features
+        # ravel_multi_index gives how deep an indexed value is:
+        # Here, given (s,a) locate the parameter, return its index - like flattening and returning the result
+        # (s,a) decide on the linearized depth; (self.n_states, self_n_actions)
+        # is the size of the array that we look from.
         for a in range(self.n_actions):
-            # ravel_multi_index gives how deep an indexed value is:
-            # Here, given s,a locate the parameter, return its index
-            # (s,a) decide on the linearized depth; (self.n_states, self_n_actions)
-            # is the size of the array that we look from.
+            # i := index of feature a given state s. Make a matrix of  (self.n_states, self.n_actions):
+            # which flattened index would (s, a) would correspond to.
             i = np.ravel_multi_index((s, a), (self.n_states, self.n_actions))
-            features[a, i] = 1.0
-            # What it does: For each feature that we have (which has dim n_states * n_actions)
-            # For each state in this feature there are 4 actions (1 state will have 4 rows for each action)
-            # Set the associated action i to 1, the rest will be zero. (like one hot encoding)
-
+            features[a, i] = 1.0  # set the ith value of this action to 1, leave the rest to zero.
+            # What it does -- Given a state s: initialize feature vector for all actions.
+            # Finds the flattened index of (s,a) if (s,a) was kept in tabular form.
+            # One-hot encodes taking of that action (only a single action) to this index.
+            # does this to all possible actions of a given state.
+            # state-encoding applied on the fly.
         return features  # Dimension 4x (n_states*n_actions)
 
     def decode_policy(self, theta):
@@ -32,14 +38,21 @@ class LinearWrapper:
 
         # Reverse the encoding operation to get the policy and the value.
         for s in range(self.n_states):
-            features = self.encode_state(s)  # Fetching all the features of a state
-            q = features.dot(theta)  # Linear combination of states with state parameter (weights)
+            features = self.encode_state(s)  # Fetching all encoded features of a given state-action
+            q = features.dot(theta)  # Linear combination of states with state parameter (weights-theta)
             # Returns q (vector of 4, for the given state)
+            # Multiplication with theta gives linear combination of state s' with the learned weights from all
+            # past actions taken.
+            #
+            # As no tables are present; "q dot theta" actually filters the theta value encoded
+            # for that particular state-actions, due to one hot encoding; all unrelated theta values will be
+            # suppressed by feature values.
 
             # Policy via argmax returns index for that particular state - take best action from q
             policy[s] = np.argmax(q)
             # Value by max, returns value of the best q.
             value[s] = np.max(q)
+            # Best policy and value is picked for each state.
 
         return policy, value
 
