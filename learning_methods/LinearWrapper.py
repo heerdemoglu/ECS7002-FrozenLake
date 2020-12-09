@@ -44,14 +44,17 @@ class LinearWrapper:
         return policy, value
 
     def reset(self):
+        # Reset the state and encode for linear wrapping
         return self.encode_state(self.env.reset())
 
     def step(self, action):
+        # take action in the environment
         state, reward, done = self.env.step(action)
 
         return self.encode_state(state), reward, done
 
     def render(self, policy=None, value=None):
+        # render called from super.
         self.env.render(policy, value)
 
 
