@@ -3,7 +3,8 @@
 ### Due: December 11, 2020
 
 ### Team Members:
-Luke Abela, Hasan Emre Erdemoglu, Suraj Gehlot
+Luke Abela (200588919), Hasan Emre Erdemoglu (200377106),
+Suraj Gehlot (7502072165)
 
 ### About Project Structure: 
 The code is runnable via scripts: _**RunEnvironmentBig.py**_ 
@@ -36,3 +37,15 @@ modularity and readibility.
    _**LinearWrapper.py**_ script realizes model free 
    and non-tabular implementation of Q-learning and SARSA 
    algorithms, using Linear Function Approximation.
+
+### How to run the main function:
+
+_**RunEnvironmentBig.py**_ and _**RunEnvironmentSmall.py**_
+will run every learning method which is realized in 
+_**learning_methods**_ folder.
+
+The code is written in such way that the outputs are given 
+in the terminal window (if any numeric output is requested).
+Otherwise, Questions 2 and 5 uses _**RunEnvironmentBig.py**_ 
+and Question 3 uses _**RunEnvironmentSmall.py**_. Questions
+1, 3 and 4 are discussion questions with no outputs available.
