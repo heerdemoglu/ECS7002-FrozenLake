@@ -1,4 +1,5 @@
 import numpy as np
+from learning_methods.TabularModelBasedMethods import policy_evaluation
 
 
 def e_greedy(q, actions, epsilon):
@@ -23,14 +24,21 @@ def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
 
         while not terminal:
             next_s, r, terminal = env.step(a)  # Storing the current state, the current reward and if this is the terminal state or not
-            next_a = e_greedy(q[s], env.n_actions, epsilon[i]) # selecting the action next_a according to e-greedy policy given state next_s
-            q[s, a] = q[s, a] + eta[i] * (r + (gamma * q[next_s, next_a]) - q[s, a])   # Storing the new values in the q
+            next_a = e_greedy(q[next_s], env.n_actions, epsilon[i]) # selecting the action next_a according to e-greedy policy given state next_s
+            q[s, a] += eta[i] * (r + (gamma * q[next_s, next_a]) - q[s, a])   # Storing the new values in the q
             s = next_s  # storing the next state as the current state for the next episode
             a = next_a  # storing the next action as the current action for the next episode
 
-    policy = q.argmax(axis=1)
-    value = q.max(axis=1)
+        policy = q.argmax(axis=1)
+        value = q.max(axis=1)
 
+        value_pe = policy_evaluation(env, policy, gamma, theta=0.001, max_iterations=100)
+        if (abs(value_pe - value) < 0.1 * np.ones((1, len(value)))).all():
+            print('SARSA Episodes: ', str(i+1))
+            break
+
+    if i+1 == max_episodes:
+        print('SARSA Episodes: ', str(i + 1))
     return policy, value
 
 
@@ -52,7 +60,15 @@ def q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
             q[s, a] = q[s, a] + eta[i] * (r + (gamma * max(q[next_s])) - q[s, a])   # Storing the new values in the q
             s = next_s  # storing the next state as the current state for the next episode
 
-    policy = q.argmax(axis=1)
-    value = q.max(axis=1)
+        policy = q.argmax(axis=1)
+        value = q.max(axis=1)
+
+        value_pe = policy_evaluation(env, policy, gamma, theta=0.001, max_iterations=100)
+        if (abs(value_pe - value) < 0.1 * np.ones((1, len(value)))).all():
+            print('Q-learning Episodes: ', str(i + 1))
+            break
+
+    if i+1 == max_episodes:
+        print('Q-learning Episodes: ', str(i + 1))
 
     return policy, value
