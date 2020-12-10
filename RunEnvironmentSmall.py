@@ -41,17 +41,17 @@ def main():
 
     print('')
 
-    # print('## Sarsa')
-    # policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    # env.render(policy, value)
-    #
-    # print('')
-    #
-    # print('## Q-learning')
-    # policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
-    # env.render(policy, value)
-    #
-    # print('')
+    print('## Sarsa')
+    policy, value = sarsa(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    env.render(policy, value)
+
+    print('')
+
+    print('## Q-learning')
+    policy, value = q_learning(env, max_episodes, eta, gamma, epsilon, seed=seed)
+    env.render(policy, value)
+
+    print('')
 
     linear_env = LinearWrapper(env)
 
